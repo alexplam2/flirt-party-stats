@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLIRT PARTY — Statistics</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --magenta: #C2185B;
+  --hot: #E91E8C;
+  --pale: #FCE4EC;
+  --muted: #9e4a6e;
+  --border: #f0c4d8;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #fff;
+  color: #1a0610;
+}
+
+header {
+  text-align: center;
+  padding: 40px 20px 28px;
+  border-bottom: 2px solid var(--border);
+}
+
+header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 5vw, 38px);
+  font-weight: 900;
+  color: var(--magenta);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+header p {
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+thead th {
+  background: var(--magenta);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 13px 16px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+tbody tr:hover { background: var(--pale); }
+tbody tr.empty { background: #fafafa; }
+
+td {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 14px;
+  color: #1a0610;
+  white-space: nowrap;
+}
+
+.num {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--magenta);
+}
+
+.gbar-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.gbar { width: 72px; height: 5px; border-radius: 3px; background: #f0c4d8; overflow: hidden; }
+.gbar-fill { height: 100%; background: linear-gradient(90deg, #1565C0, var(--hot)); border-radius: 3px; }
+.gnums { font-size: 11px; color: var(--muted); }
+
+.gross { color: #7B4F00; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
+.ours  { color: #2E7D32; font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
+.ratio { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+.empty td { color: #ccc; font-size: 12px; font-style: italic; }
+.empty .num { color: #dbb8c8; font-size: 16px; }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--border);
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>♥ Flirt Party Statistics ♥</h1>
+  <p>Analytics — starting from Party 14</p>
+</header>
+
+<div class="container">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Всего людей</th>
+        <th>Парни / Девушки</th>
+        <th>Просмотры</th>
+        <th>Просмотры / Чел.</th>
+        <th>Отзывы</th>
+        <th>Отзывы / Чел.</th>
+        <th>Общий куш</th>
+        <th>Наша сумма</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<footer>♥ Flirt Party — Internal Use Only ♥</footer>
+
+<script>
+const data = [
+  { num: 14, total: 250, men: 140, women: 110, views: 286400, reviews: 70, gross: 28000, ours: 12000 },
+  // { num: 15, total: 0, men: 0, women: 0, views: 0, reviews: 0, gross: 0, ours: 0 },
+];
+
+const FUTURE_SLOTS = 6;
+const lastNum = data.length ? data[data.length - 1].num : 13;
+
+function fmt(n) { return n.toLocaleString('ru-RU'); }
+function money(n) { return fmt(n) + ' MDL'; }
+
+const tbody = document.getElementById('tbody');
+
+data.forEach(p => {
+  const vpp = (p.views / p.total).toFixed(1);
+  const rpp = ((p.reviews / p.total) * 100).toFixed(1);
+  const menPct = Math.round(p.men / p.total * 100);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><span class="num">${p.num}</span></td>
+    <td>${fmt(p.total)}</td>
+    <td>
+      <div class="gbar-wrap">
+        <div class="gbar"><div class="gbar-fill" style="width:${menPct}%"></div></div>
+        <span class="gnums">♂ ${p.men} &nbsp;·&nbsp; ♀ ${p.women}</span>
+      </div>
+    </td>
+    <td>${fmt(p.views)}</td>
+    <td><span class="ratio">${vpp}x</span></td>
+    <td>${fmt(p.reviews)}</td>
+    <td><span class="ratio">${rpp}%</span></td>
+    <td><span class="gross">${money(p.gross)}</span></td>
+    <td><span class="ours">${money(p.ours)}</span></td>
+  `;
+  tbody.appendChild(tr);
+});
+
+for (let i = 1; i <= FUTURE_SLOTS; i++) {
+  const tr = document.createElement('tr');
+  tr.className = 'empty';
+  tr.innerHTML = `
+    <td><span class="num">${lastNum + i}</span></td>
+    <td colspan="8">— ожидается —</td>
+  `;
+  tbody.appendChild(tr);
+}
+</script>
+</body>
+</html>
